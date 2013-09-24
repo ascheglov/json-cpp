@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{ef4c6702-1767-47ed-94f9-df9612739380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{453dc671-e160-40bc-ac9c-6a95fc77744c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\json-cpp">
+      <UniqueIdentifier>{7811eb00-e7fc-4ab5-827f-d64cea7ebbb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\json-cpp\details">
+      <UniqueIdentifier>{addb7f09-9fbd-42e5-9e1d-befadd678e47}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\parser_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests_main.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\generator_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\variant_example.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\examples.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\json-cpp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\ParserError.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\value_types.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\number_parser.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\ParserImpl.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\string_parser.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\catch_wrap.hpp">
+      <Filter>tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\serialization_helpers.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\Stream.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\parse.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\generate.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\number_writer.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\string_writer.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\std_types.hpp">
+      <Filter>Header Files\json-cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\json-cpp\details\parser_utility.hpp">
+      <Filter>Header Files\json-cpp\details</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" />
+  </ItemGroup>
+</Project>
