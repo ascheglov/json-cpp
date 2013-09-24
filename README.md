@@ -40,7 +40,7 @@ You can find more examples in the `/tests/` directory.
 ## Installation
 
 This is a header-only library.  
-Just download the [single header version](/single_header/json-cpp.hpp) and use it in your projects.
+Just download the [single header version](https://raw.github.com/ascheglov/json-cpp/master/single_include/json-cpp.hpp) and use it in your projects.
 
 Or, you can checkout whole repository and add the `/include/` directory to compiler's header search path.
 You might also want to run tests from a `/tests/{compiler}/` directory.
