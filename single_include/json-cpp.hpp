@@ -2,15 +2,19 @@
 // DO NOT EDIT !!! This file was generated with a script.
 //
 // JSON for C++
-// Version 0.1 alpha, rev. 6437a55ef753b229ce79ce729fe771aeb3a40dd4
-// Generated 2013-09-25 14:03:15.373532 UTC
+// https://github.com/ascheglov/json-cpp
+// Version 0.1 alpha, rev. a0ac72d67ecbf070141187c25370cbfe16ecbe4b
+// Generated 2013-09-25 17:09:41.937007 UTC
 //
 // Belongs to the public domain
 
 #pragma once
-    
 
+//----------------------------------------------------------------------
+// json-cpp.hpp begin
 
+//----------------------------------------------------------------------
+// json-cpp/parse.hpp begin
 
 #include <memory>
 #include <istream>
@@ -18,7 +22,8 @@
 #include <string>
 #include <type_traits>
 
-
+//----------------------------------------------------------------------
+// json-cpp/ParserError.hpp begin
 
 #include <cassert>
 #include <cstddef>
@@ -92,6 +97,11 @@ namespace jsoncpp
 
 #undef JSONCPP_INTERNAL_NOEXCEPT_
 
+// json-cpp/ParserError.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/Stream.hpp begin
 
 namespace jsoncpp
 {
@@ -122,6 +132,11 @@ namespace jsoncpp
         value.serialize(stream);
     }
 }
+// json-cpp/Stream.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/value_types.hpp begin
 
 namespace jsoncpp
 {
@@ -140,11 +155,15 @@ namespace jsoncpp
         Object = 0x20 | TypeIsNotFundamental | TypeIsCollection,
     };
 }
+// json-cpp/value_types.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/details/parser_utility.hpp begin
 
 #include <cassert>
 #include <cstddef>
 #include <utility>
-
 
 namespace jsoncpp { namespace details
 {
@@ -235,6 +254,11 @@ namespace jsoncpp { namespace details
     };
 }}
 
+// json-cpp/details/parser_utility.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/details/number_parser.hpp begin
 
 #include <cmath>
 
@@ -309,9 +333,13 @@ namespace jsoncpp { namespace details
         return number;
     }
 }}
+// json-cpp/details/number_parser.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/details/string_parser.hpp begin
 
 #include <string>
-
 
 namespace jsoncpp { namespace details
 {
@@ -475,7 +503,6 @@ namespace jsoncpp { namespace details
                             if (err != ParserError::NoError)
                                 return err;
 
-
                             add(CharType::UTF16Pair, codeUnit, trailSurrogate);
                         }
                         else
@@ -494,6 +521,9 @@ namespace jsoncpp { namespace details
         }
     }
 }}
+// json-cpp/details/string_parser.hpp end
+//----------------------------------------------------------------------
+
 namespace jsoncpp
 {
     template<typename CharT, typename InputIterator>
@@ -734,6 +764,11 @@ namespace jsoncpp
     }
 }
 
+// json-cpp/parse.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/std_types.hpp begin
 
 #include <deque>
 #include <forward_list>
@@ -746,12 +781,14 @@ namespace jsoncpp
 #include <unordered_set>
 #include <vector>
 
-
+//----------------------------------------------------------------------
+// json-cpp/generate.hpp begin
 
 #include <sstream>
 #include <string>
 
-
+//----------------------------------------------------------------------
+// json-cpp/details/string_writer.hpp begin
 
 #include <string>
 
@@ -793,6 +830,9 @@ namespace jsoncpp { namespace details
         sink('"');
     }
 }}
+
+// json-cpp/details/string_writer.hpp end
+//----------------------------------------------------------------------
 
 namespace jsoncpp
 {
@@ -916,6 +956,9 @@ namespace jsoncpp
         return rawStream.str();
     }
 }
+
+// json-cpp/generate.hpp end
+//----------------------------------------------------------------------
 
 namespace jsoncpp
 {
@@ -1067,10 +1110,14 @@ namespace jsoncpp
     inline void serialize(Stream<X>& stream, std::unordered_map<std::string, T>& t)
     { details::serializeStrMap(stream, t); }
 }
+// json-cpp/std_types.hpp end
+//----------------------------------------------------------------------
+
+//----------------------------------------------------------------------
+// json-cpp/serialization_helpers.hpp begin
 
 #include <array>
 #include <unordered_map>
-
 
 namespace jsoncpp
 {
@@ -1171,3 +1218,10 @@ namespace jsoncpp
         generator.objectEnd();
     }
 }
+
+// json-cpp/serialization_helpers.hpp end
+//----------------------------------------------------------------------
+
+// json-cpp.hpp end
+//----------------------------------------------------------------------
+
