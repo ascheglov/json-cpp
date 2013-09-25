@@ -19,8 +19,9 @@ TEST_CASE("Parsing JSON") {
     Foo foo;
     jsoncpp::parse(foo, R"(
     {
-        "num": 42,
-        "str": "banana - \uD83C\uDF4c",
+        // a comment
+        "str" : "banana - \uD83C\uDF4c",
+        "num" : 42, // parser supports trailing commas
     } )");
     REQUIRE(foo.num == 42);
     REQUIRE(foo.str == "banana - \xF0\x9F\x8D\x8C");

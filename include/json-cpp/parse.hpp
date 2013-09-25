@@ -141,6 +141,13 @@ namespace jsoncpp
             {
                 switch (*m_reader)
                 {
+                case '/':
+                    ++m_reader;
+                    check('/');
+                    while (*m_reader != '\n')
+                        ++m_reader;
+
+                    // no break here
                 case '\n':
                     m_reader.m_diag.newLine();
                     break;
