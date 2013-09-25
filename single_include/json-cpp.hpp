@@ -3,8 +3,8 @@
 //
 // JSON for C++
 // https://github.com/ascheglov/json-cpp
-// Version 0.1 alpha, rev. a0ac72d67ecbf070141187c25370cbfe16ecbe4b
-// Generated 2013-09-25 17:09:41.937007 UTC
+// Version 0.1 alpha, rev. 80d64c35bb9ec660c0e79912ef41943f374f2671
+// Generated 2013-09-25 18:51:43.704096 UTC
 //
 // Belongs to the public domain
 
@@ -649,6 +649,13 @@ namespace jsoncpp
             {
                 switch (*m_reader)
                 {
+                case '/':
+                    ++m_reader;
+                    check('/');
+                    while (*m_reader != '\n')
+                        ++m_reader;
+
+                    // no break here
                 case '\n':
                     m_reader.m_diag.newLine();
                     break;
@@ -701,17 +708,15 @@ namespace jsoncpp
         inline void parseList(Parser<X>& parser, Type type, char terminator, Callback&& callback)
         {
             parser.checkType(type);
-            if (!parser.isListEnd(terminator))
+
+            while (!parser.isListEnd(terminator))
             {
-                for (;;)
-                {
-                    callback();
+                callback();
 
-                    if (parser.isListEnd(terminator))
-                        return;
+                if (parser.isListEnd(terminator))
+                    return;
 
-                    parser.eatListSeparator();
-                }
+                parser.eatListSeparator();
             }
         }
     }
