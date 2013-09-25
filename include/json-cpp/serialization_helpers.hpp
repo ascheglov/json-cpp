@@ -91,7 +91,7 @@ namespace jsoncpp
         {
             auto fieldInfo = table.find(fieldName);
             if (fieldInfo == nullptr)
-                throw parser.unknownField();
+                throw parser.makeError(ParserError::UnknownField);
 
             auto fieldPtr = ptrs[fieldInfo->m_fieldIdx];
             fieldInfo->m_parseFn(parser, fieldPtr);

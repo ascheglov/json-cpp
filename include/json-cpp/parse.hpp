@@ -9,9 +9,12 @@
 #include <string>
 #include <type_traits>
 
-#include <json-cpp/details/ParserImpl.hpp>
+#include <json-cpp/ParserError.hpp>
 #include <json-cpp/Stream.hpp>
 #include <json-cpp/value_types.hpp>
+#include <json-cpp/details/parser_utility.hpp>
+#include <json-cpp/details/number_parser.hpp>
+#include <json-cpp/details/string_parser.hpp>
 
 namespace jsoncpp
 {
@@ -21,108 +24,208 @@ namespace jsoncpp
     public:
         using this_type = Parser<details::Traits2<CharT, InputIterator>>;
 
-        explicit Stream(InputIterator first, InputIterator last) : m_impl(first, last)
+        explicit Stream(InputIterator first, InputIterator last)
+            : m_reader{first, last}
         {
-            m_impl.nextValue();
+            nextValue();
         }
 
-        Type peekType()
-        {
-            return m_impl.m_type;
-        }
-
-        bool firstObjectField()
-        {
-            m_impl.check(Type::Object);
-            return m_impl.nextObjectField(true, m_fieldName);
-        }
-
+        Type getType() const { return m_type; }
+        bool getBoolean() const { return m_boolean; }
+        double getNumber() const { return m_number; }
         const std::string& getFieldName() const { return m_fieldName; }
 
-        bool nextObjectField()
+        void checkType(Type type) const
         {
-            return m_impl.nextObjectField(false, m_fieldName);
+            if (getType() != type)
+                throw makeError(ParserError::UnexpectedType);
         }
 
-        bool firstArrayItem()
+        bool isListEnd(char terminator)
         {
-            m_impl.check(Type::Array);
-            return m_impl.nextArrayItem(true);
+            eatWhitespace();
+            if (*m_reader != terminator)
+                return false;
+
+            ++m_reader;
+            return true;
         }
 
-        bool nextArrayItem()
+        void eatListSeparator()
         {
-            return m_impl.nextArrayItem(false);
+            eatWhitespace();
+            check(',');
+            eatWhitespace();
         }
 
-        friend void serialize(this_type& stream, bool& value)
+        void nextNameValuePair()
         {
-            stream.m_impl.check(Type::Boolean);
-            value = stream.m_impl.m_boolean;
+            eatWhitespace();
+            check('"');
+            parseString(m_fieldName);
+            eatWhitespace();
+            check(':');
+            nextValue();
+        }
+
+        void nextValue()
+        {
+            eatWhitespace();
+            m_type = nextValueImpl();
         }
 
         template<typename DstCharT>
-        friend void serialize(this_type& stream, std::basic_string<DstCharT>& value)
+        void parseString(std::basic_string<DstCharT>& str)
         {
-            stream.m_impl.check(Type::String);
-            stream.m_impl.parseString(value);
+            auto err = parseStringImpl(m_reader, str);
+            if (err != ParserError::NoError)
+                throw m_reader.m_diag.makeError(err);
         }
 
-        template<typename T>
-        friend typename std::enable_if<std::is_arithmetic<T>::value>::type
-            serialize(this_type& stream, T& value)
+        ParserError makeError(ParserError::Type type) const
         {
-            stream.m_impl.check(Type::Number);
-            value = static_cast<T>(stream.m_impl.m_number);
-            if (value != stream.m_impl.m_number)
-                throw stream.m_impl.makeError(ParserError::NumberIsOutOfRange);
-        }
-
-        ParserError unknownField() const
-        {
-            return m_impl.makeError(ParserError::UnknownField);
-        }
-
-    public: // utility members
-        Stream(const this_type&) = delete;
-        Stream(this_type&& rhs) { swap(rhs); }
-        void operator=(this_type rhs) { swap(rhs); }
-
-        void swap(this_type& other)
-        {
-            m_impl.swap(other.m_impl);
-            m_fieldName.swap(other.m_fieldName);
+            return m_reader.m_diag.makeError(type);
         }
 
     private:
-        details::ParserImpl<InputIterator> m_impl;
+        Type nextValueImpl()
+        {
+            switch (*m_reader)
+            {
+            case '{': ++m_reader; return Type::Object;
+            case '[': ++m_reader; return Type::Array;
+            case 't': ++m_reader; checkLiteral("true"); m_boolean = true; return Type::Boolean;
+            case 'f': ++m_reader; checkLiteral("false"); m_boolean = false; return Type::Boolean;
+            case 'n': ++m_reader; checkLiteral("null"); return Type::Null;
+            case '"': ++m_reader; return Type::String;
+
+            case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9':
+                m_number = parseRealNumber(m_reader);
+                return Type::Number;
+
+            case '-':
+                ++m_reader;
+                m_number = -parseRealNumber(m_reader);
+                return Type::Number;
+            }
+
+            throw unexpectedCharacter();
+        }
+
+        ParserError unexpectedCharacter() const
+        {
+            return makeError(ParserError::UnexpectedCharacter);
+        }
+
+        void check(char expectedChar)
+        {
+            if (*m_reader != expectedChar)
+                throw unexpectedCharacter();
+
+            ++m_reader;
+        }
+
+        template<std::size_t N>
+        void checkLiteral(const char(&literal)[N])
+        {
+            static_assert(N > 2, "");
+            for (auto i = 1; i != N - 1; ++i, ++m_reader)
+                if (*m_reader != literal[i])
+                    throw unexpectedCharacter();
+        }
+
+        void eatWhitespace()
+        {
+            for (;; ++m_reader)
+            {
+                switch (*m_reader)
+                {
+                case '\n':
+                    m_reader.m_diag.newLine();
+                    break;
+
+                case ' ': case '\t': case '\r':
+                    break;
+
+                default:
+                    return;
+                }
+            }
+        }
+
+        details::Reader<InputIterator> m_reader;
+
+        Type m_type;
+        double m_number;
+        bool m_boolean;
         std::string m_fieldName;
     };
 
-    template<class X, typename Sink>
-    inline void parseObject(Parser<X>& parser, Sink&& sink)
+    template<class X>
+    inline void serialize(Parser<X>& parser, bool& value)
     {
-        if (parser.firstObjectField())
+        parser.checkType(Type::Boolean);
+        value = parser.getBoolean();
+    }
+
+    template<class X, typename T>
+    inline typename std::enable_if<std::is_arithmetic<T>::value>::type
+        serialize(Parser<X>& parser, T& value)
+    {
+        parser.checkType(Type::Number);
+        auto number = parser.getNumber();
+        value = static_cast<T>(number);
+        if (value != number)
+            throw parser.makeError(ParserError::NumberIsOutOfRange);
+    }
+
+    template<class X, typename DstCharT>
+    inline void serialize(Parser<X>& parser, std::basic_string<DstCharT>& value)
+    {
+        parser.checkType(Type::String);
+        parser.parseString(value);
+    }
+
+    namespace details
+    {
+        template<class X, typename Callback>
+        inline void parseList(Parser<X>& parser, Type type, char terminator, Callback&& callback)
         {
-            do
+            parser.checkType(type);
+            if (!parser.isListEnd(terminator))
             {
-                sink(parser.getFieldName());
+                for (;;)
+                {
+                    callback();
+
+                    if (parser.isListEnd(terminator))
+                        return;
+
+                    parser.eatListSeparator();
+                }
             }
-            while (parser.nextObjectField());
         }
     }
 
-    template<class X, typename Sink>
-    void parseArray(Parser<X>& parser, Sink&& sink)
+    template<class X, typename Callback>
+    inline void parseObject(Parser<X>& parser, Callback&& callback)
     {
-        if (parser.firstArrayItem())
+        details::parseList(parser, Type::Object, '}', [&]
         {
-            do
-            {
-                sink();
-            }
-            while (parser.nextArrayItem());
-        }
+            parser.nextNameValuePair();
+            callback(parser.getFieldName());
+        });
+    }
+
+    template<class X, typename Callback>
+    void parseArray(Parser<X>& parser, Callback&& callback)
+    {
+        details::parseList(parser, Type::Array, ']', [&]
+        {
+            parser.nextValue();
+            callback();
+        });
     }
 
     template<typename CharT, class T, typename InputIterator>

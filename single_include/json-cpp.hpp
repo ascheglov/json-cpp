@@ -2,8 +2,8 @@
 // DO NOT EDIT !!! This file was generated with a script.
 //
 // JSON for C++
-// Version 0.1 alpha, rev. eba5f866ae6f5c807c4bec74bf3c138a9b8fcfda
-// Generated 2013-09-24 22:54:55.266099 UTC
+// Version 0.1 alpha, rev. 6437a55ef753b229ce79ce729fe771aeb3a40dd4
+// Generated 2013-09-25 14:03:15.373532 UTC
 //
 // Belongs to the public domain
 
@@ -17,10 +17,6 @@
 #include <iterator>
 #include <string>
 #include <type_traits>
-
-
-
-#include <string>
 
 
 
@@ -96,6 +92,36 @@ namespace jsoncpp
 
 #undef JSONCPP_INTERNAL_NOEXCEPT_
 
+
+namespace jsoncpp
+{
+    template<class Traits>
+    class Stream;
+
+    namespace details
+    {
+        template<typename CharT, class X>
+        struct Traits2 {};
+
+        template<class Traits>
+        struct ParserTraits {};
+
+        template<class Traits>
+        struct GeneratorTraits {};
+    }
+
+    template<class X>
+    using Parser = Stream<details::ParserTraits<X>>;
+
+    template<class X>
+    using Generator = Stream<details::GeneratorTraits<X>>;
+
+    template<typename X, typename T>
+    inline auto serialize(Stream<X>& stream, T& value) -> decltype(value.serialize(stream), void())
+    {
+        value.serialize(stream);
+    }
+}
 
 namespace jsoncpp
 {
@@ -468,17 +494,57 @@ namespace jsoncpp { namespace details
         }
     }
 }}
-namespace jsoncpp { namespace details
+namespace jsoncpp
 {
-    template<typename InputIterator>
-    class ParserImpl
+    template<typename CharT, typename InputIterator>
+    class Stream<details::ParserTraits<details::Traits2<CharT, InputIterator>>>
     {
     public:
-        ParserImpl(InputIterator first, InputIterator last) : m_reader(first, last) {}
+        using this_type = Parser<details::Traits2<CharT, InputIterator>>;
 
-        Type m_type;
-        double m_number;
-        bool m_boolean;
+        explicit Stream(InputIterator first, InputIterator last)
+            : m_reader{first, last}
+        {
+            nextValue();
+        }
+
+        Type getType() const { return m_type; }
+        bool getBoolean() const { return m_boolean; }
+        double getNumber() const { return m_number; }
+        const std::string& getFieldName() const { return m_fieldName; }
+
+        void checkType(Type type) const
+        {
+            if (getType() != type)
+                throw makeError(ParserError::UnexpectedType);
+        }
+
+        bool isListEnd(char terminator)
+        {
+            eatWhitespace();
+            if (*m_reader != terminator)
+                return false;
+
+            ++m_reader;
+            return true;
+        }
+
+        void eatListSeparator()
+        {
+            eatWhitespace();
+            check(',');
+            eatWhitespace();
+        }
+
+        void nextNameValuePair()
+        {
+            eatWhitespace();
+            check('"');
+            parseString(m_fieldName);
+            eatWhitespace();
+            check(':');
+            nextValue();
+        }
 
         void nextValue()
         {
@@ -486,58 +552,8 @@ namespace jsoncpp { namespace details
             m_type = nextValueImpl();
         }
 
-        void check(Type type)
-        {
-            if (m_type != type)
-                throw makeError(ParserError::UnexpectedType);
-        }
-
-        bool nextObjectField(bool first, std::string& name)
-        {
-            eatWhitespace();
-            if (*m_reader == '}')
-            {
-                ++m_reader;
-                return false;
-            }
-
-            if (!first)
-            {
-                check(',');
-                eatWhitespace();
-            }
-
-            check('"');
-            parseString(name);
-
-            eatWhitespace();
-            check(':');
-
-            nextValue();
-            return true;
-        }
-
-        bool nextArrayItem(bool first)
-        {
-            eatWhitespace();
-            if (*m_reader == ']')
-            {
-                ++m_reader;
-                return false;
-            }
-
-            if (!first)
-            {
-                check(',');
-                eatWhitespace();
-            }
-
-            m_type = nextValueImpl();
-            return true;
-        }
-
-        template<typename CharT>
-        void parseString(std::basic_string<CharT>& str)
+        template<typename DstCharT>
+        void parseString(std::basic_string<DstCharT>& str)
         {
             auto err = parseStringImpl(m_reader, str);
             if (err != ParserError::NoError)
@@ -556,9 +572,9 @@ namespace jsoncpp { namespace details
             {
             case '{': ++m_reader; return Type::Object;
             case '[': ++m_reader; return Type::Array;
-            case 't': ++m_reader; expect("true"); m_boolean = true; return Type::Boolean;
-            case 'f': ++m_reader; expect("false"); m_boolean = false; return Type::Boolean;
-            case 'n': ++m_reader; expect("null"); return Type::Null;
+            case 't': ++m_reader; checkLiteral("true"); m_boolean = true; return Type::Boolean;
+            case 'f': ++m_reader; checkLiteral("false"); m_boolean = false; return Type::Boolean;
+            case 'n': ++m_reader; checkLiteral("null"); return Type::Null;
             case '"': ++m_reader; return Type::String;
 
             case '0': case '1': case '2': case '3': case '4':
@@ -577,7 +593,7 @@ namespace jsoncpp { namespace details
 
         ParserError unexpectedCharacter() const
         {
-            return m_reader.m_diag.makeError(ParserError::UnexpectedCharacter);
+            return makeError(ParserError::UnexpectedCharacter);
         }
 
         void check(char expectedChar)
@@ -589,11 +605,11 @@ namespace jsoncpp { namespace details
         }
 
         template<std::size_t N>
-        void expect(const char (&s)[N])
+        void checkLiteral(const char(&literal)[N])
         {
             static_assert(N > 2, "");
             for (auto i = 1; i != N - 1; ++i, ++m_reader)
-                if (*m_reader != s[i])
+                if (*m_reader != literal[i])
                     throw unexpectedCharacter();
         }
 
@@ -616,149 +632,78 @@ namespace jsoncpp { namespace details
             }
         }
 
-        Reader<InputIterator> m_reader;
-    };
-}}
+        details::Reader<InputIterator> m_reader;
 
-namespace jsoncpp
-{
-    template<class Traits>
-    class Stream;
-
-    namespace details
-    {
-        template<typename CharT, class X>
-        struct Traits2 {};
-
-        template<class Traits>
-        struct ParserTraits {};
-
-        template<class Traits>
-        struct GeneratorTraits {};
-    }
-
-    template<class X>
-    using Parser = Stream<details::ParserTraits<X>>;
-
-    template<class X>
-    using Generator = Stream<details::GeneratorTraits<X>>;
-
-    template<typename X, typename T>
-    inline auto serialize(Stream<X>& stream, T& value) -> decltype(value.serialize(stream), void())
-    {
-        value.serialize(stream);
-    }
-}
-namespace jsoncpp
-{
-    template<typename CharT, typename InputIterator>
-    class Stream<details::ParserTraits<details::Traits2<CharT, InputIterator>>>
-    {
-    public:
-        using this_type = Parser<details::Traits2<CharT, InputIterator>>;
-
-        explicit Stream(InputIterator first, InputIterator last) : m_impl(first, last)
-        {
-            m_impl.nextValue();
-        }
-
-        Type peekType()
-        {
-            return m_impl.m_type;
-        }
-
-        bool firstObjectField()
-        {
-            m_impl.check(Type::Object);
-            return m_impl.nextObjectField(true, m_fieldName);
-        }
-
-        const std::string& getFieldName() const { return m_fieldName; }
-
-        bool nextObjectField()
-        {
-            return m_impl.nextObjectField(false, m_fieldName);
-        }
-
-        bool firstArrayItem()
-        {
-            m_impl.check(Type::Array);
-            return m_impl.nextArrayItem(true);
-        }
-
-        bool nextArrayItem()
-        {
-            return m_impl.nextArrayItem(false);
-        }
-
-        friend void serialize(this_type& stream, bool& value)
-        {
-            stream.m_impl.check(Type::Boolean);
-            value = stream.m_impl.m_boolean;
-        }
-
-        template<typename DstCharT>
-        friend void serialize(this_type& stream, std::basic_string<DstCharT>& value)
-        {
-            stream.m_impl.check(Type::String);
-            stream.m_impl.parseString(value);
-        }
-
-        template<typename T>
-        friend typename std::enable_if<std::is_arithmetic<T>::value>::type
-            serialize(this_type& stream, T& value)
-        {
-            stream.m_impl.check(Type::Number);
-            value = static_cast<T>(stream.m_impl.m_number);
-            if (value != stream.m_impl.m_number)
-                throw stream.m_impl.makeError(ParserError::NumberIsOutOfRange);
-        }
-
-        ParserError unknownField() const
-        {
-            return m_impl.makeError(ParserError::UnknownField);
-        }
-
-    public: // utility members
-        Stream(const this_type&) = delete;
-        Stream(this_type&& rhs) { swap(rhs); }
-        void operator=(this_type rhs) { swap(rhs); }
-
-        void swap(this_type& other)
-        {
-            m_impl.swap(other.m_impl);
-            m_fieldName.swap(other.m_fieldName);
-        }
-
-    private:
-        details::ParserImpl<InputIterator> m_impl;
+        Type m_type;
+        double m_number;
+        bool m_boolean;
         std::string m_fieldName;
     };
 
-    template<class X, typename Sink>
-    inline void parseObject(Parser<X>& parser, Sink&& sink)
+    template<class X>
+    inline void serialize(Parser<X>& parser, bool& value)
     {
-        if (parser.firstObjectField())
+        parser.checkType(Type::Boolean);
+        value = parser.getBoolean();
+    }
+
+    template<class X, typename T>
+    inline typename std::enable_if<std::is_arithmetic<T>::value>::type
+        serialize(Parser<X>& parser, T& value)
+    {
+        parser.checkType(Type::Number);
+        auto number = parser.getNumber();
+        value = static_cast<T>(number);
+        if (value != number)
+            throw parser.makeError(ParserError::NumberIsOutOfRange);
+    }
+
+    template<class X, typename DstCharT>
+    inline void serialize(Parser<X>& parser, std::basic_string<DstCharT>& value)
+    {
+        parser.checkType(Type::String);
+        parser.parseString(value);
+    }
+
+    namespace details
+    {
+        template<class X, typename Callback>
+        inline void parseList(Parser<X>& parser, Type type, char terminator, Callback&& callback)
         {
-            do
+            parser.checkType(type);
+            if (!parser.isListEnd(terminator))
             {
-                sink(parser.getFieldName());
+                for (;;)
+                {
+                    callback();
+
+                    if (parser.isListEnd(terminator))
+                        return;
+
+                    parser.eatListSeparator();
+                }
             }
-            while (parser.nextObjectField());
         }
     }
 
-    template<class X, typename Sink>
-    void parseArray(Parser<X>& parser, Sink&& sink)
+    template<class X, typename Callback>
+    inline void parseObject(Parser<X>& parser, Callback&& callback)
     {
-        if (parser.firstArrayItem())
+        details::parseList(parser, Type::Object, '}', [&]
         {
-            do
-            {
-                sink();
-            }
-            while (parser.nextArrayItem());
-        }
+            parser.nextNameValuePair();
+            callback(parser.getFieldName());
+        });
+    }
+
+    template<class X, typename Callback>
+    void parseArray(Parser<X>& parser, Callback&& callback)
+    {
+        details::parseList(parser, Type::Array, ']', [&]
+        {
+            parser.nextValue();
+            callback();
+        });
     }
 
     template<typename CharT, class T, typename InputIterator>
@@ -977,7 +922,7 @@ namespace jsoncpp
     template<class X, typename T>
     inline void serialize(Parser<X>& parser, std::shared_ptr<T>& obj)
     {
-        if (parser.peekType() != jsoncpp::Type::Null)
+        if (parser.getType() != jsoncpp::Type::Null)
         {
             obj = std::make_shared<T>();
             serialize(parser, *obj);
@@ -997,7 +942,7 @@ namespace jsoncpp
     template<class X, typename T>
     inline void serialize(Parser<X>& parser, std::unique_ptr<T>& obj)
     {
-        if (parser.peekType() != jsoncpp::Type::Null)
+        if (parser.getType() != jsoncpp::Type::Null)
         {
             obj->reset(new T());
             serialize(parser, *obj);
@@ -1209,7 +1154,7 @@ namespace jsoncpp
         {
             auto fieldInfo = table.find(fieldName);
             if (fieldInfo == nullptr)
-                throw parser.unknownField();
+                throw parser.makeError(ParserError::UnknownField);
 
             auto fieldPtr = ptrs[fieldInfo->m_fieldIdx];
             fieldInfo->m_parseFn(parser, fieldPtr);

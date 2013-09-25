@@ -22,7 +22,7 @@ namespace jsoncpp
     template<class X, typename T>
     inline void serialize(Parser<X>& parser, std::shared_ptr<T>& obj)
     {
-        if (parser.peekType() != jsoncpp::Type::Null)
+        if (parser.getType() != jsoncpp::Type::Null)
         {
             obj = std::make_shared<T>();
             serialize(parser, *obj);
@@ -42,7 +42,7 @@ namespace jsoncpp
     template<class X, typename T>
     inline void serialize(Parser<X>& parser, std::unique_ptr<T>& obj)
     {
-        if (parser.peekType() != jsoncpp::Type::Null)
+        if (parser.getType() != jsoncpp::Type::Null)
         {
             obj->reset(new T());
             serialize(parser, *obj);

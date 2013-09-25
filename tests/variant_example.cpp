@@ -50,7 +50,7 @@ namespace
     template<class X>
     void serialize(jsoncpp::Parser<X>& parser, Variant& v)
     {
-        v.m_type = parser.peekType();
+        v.m_type = parser.getType();
         switch (v.m_type)
         {
         case Type::Null: case Type::Undefined: return;

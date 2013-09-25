@@ -44,9 +44,6 @@
     <ClInclude Include="..\..\include\json-cpp\details\number_parser.hpp">
       <Filter>Header Files\json-cpp\details</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\json-cpp\details\ParserImpl.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\string_parser.hpp">
       <Filter>Header Files\json-cpp\details</Filter>
     </ClInclude>
