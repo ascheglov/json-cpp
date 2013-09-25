@@ -193,17 +193,15 @@ namespace jsoncpp
         inline void parseList(Parser<X>& parser, Type type, char terminator, Callback&& callback)
         {
             parser.checkType(type);
-            if (!parser.isListEnd(terminator))
+
+            while (!parser.isListEnd(terminator))
             {
-                for (;;)
-                {
-                    callback();
+                callback();
 
-                    if (parser.isListEnd(terminator))
-                        return;
+                if (parser.isListEnd(terminator))
+                    return;
 
-                    parser.eatListSeparator();
-                }
+                parser.eatListSeparator();
             }
         }
     }

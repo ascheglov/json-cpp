@@ -20,7 +20,7 @@ TEST_CASE("Parsing JSON") {
     jsoncpp::parse(foo, R"(
     {
         "num": 42,
-        "str": "banana - \uD83C\uDF4c"
+        "str": "banana - \uD83C\uDF4c",
     } )");
     REQUIRE(foo.num == 42);
     REQUIRE(foo.str == "banana - \xF0\x9F\x8D\x8C");

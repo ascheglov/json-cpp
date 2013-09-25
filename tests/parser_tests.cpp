@@ -207,7 +207,7 @@ TEST_CASE("Parsing to different arithmetic types", "[parser]")
         "ul": 41,
         "sl": 42,
         "_f": 51,
-        "_d": 52
+        "_d": 52,
     })");
     REQUIRE(obj._c == 10);
     REQUIRE(obj.uc == 11);
@@ -280,7 +280,7 @@ TEST_CASE("Parsing to a user-defined type")
            "pt": {"x": 1, "y": 2},
            "ptr": {"d": 42},
            "ptr2": null,
-           "arr": [1, 2]
+           "arr": [1, 2],
         }
     )");
 
