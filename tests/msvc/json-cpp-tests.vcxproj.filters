@@ -4,14 +4,20 @@
     <Filter Include="tests">
       <UniqueIdentifier>{ef4c6702-1767-47ed-94f9-df9612739380}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="include">
       <UniqueIdentifier>{453dc671-e160-40bc-ac9c-6a95fc77744c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\json-cpp">
+    <Filter Include="include\json-cpp">
       <UniqueIdentifier>{7811eb00-e7fc-4ab5-827f-d64cea7ebbb3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\json-cpp\details">
+    <Filter Include="include\json-cpp\details">
       <UniqueIdentifier>{addb7f09-9fbd-42e5-9e1d-befadd678e47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{a6896c2f-57f7-4965-9d51-a2a5e720d22d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scripts">
+      <UniqueIdentifier>{7bf5904f-fe43-482b-9a7c-986fe447abde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,49 +39,55 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\json-cpp.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\ParserError.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\value_types.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\number_parser.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
+      <Filter>include\json-cpp\details</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\string_parser.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
+      <Filter>include\json-cpp\details</Filter>
     </ClInclude>
     <ClInclude Include="..\catch_wrap.hpp">
       <Filter>tests</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\serialization_helpers.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\Stream.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\parse.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\generate.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\number_writer.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
+      <Filter>include\json-cpp\details</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\string_writer.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
+      <Filter>include\json-cpp\details</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\std_types.hpp">
-      <Filter>Header Files\json-cpp</Filter>
+      <Filter>include\json-cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\json-cpp\details\parser_utility.hpp">
-      <Filter>Header Files\json-cpp\details</Filter>
+      <Filter>include\json-cpp\details</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md" />
+    <None Include="..\..\scripts\make_single_include.py">
+      <Filter>scripts</Filter>
+    </None>
+    <None Include="..\..\docs\design_notes.md">
+      <Filter>docs</Filter>
+    </None>
   </ItemGroup>
 </Project>

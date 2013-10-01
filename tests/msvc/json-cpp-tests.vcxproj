@@ -182,7 +182,9 @@
     <ClInclude Include="..\catch_wrap.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\docs\design_notes.md" />
     <None Include="..\..\README.md" />
+    <None Include="..\..\scripts\make_single_include.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
