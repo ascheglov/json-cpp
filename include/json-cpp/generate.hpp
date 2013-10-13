@@ -17,72 +17,70 @@ namespace jsoncpp
     public:
         using this_type = Generator<details::Traits2<CharT, Sink>>;
 
-        explicit Stream(Sink& sink) : m_sink(sink) {}
+        explicit Stream(Sink& sink) : m_sink(&sink) {}
 
         void objectBegin()
         {
-            m_sink << "{";
+            (*m_sink) << "{";
         }
 
         void fieldName(const char* name)
         {
-            m_sink << '"' << name << "\": ";
+            (*m_sink) << '"' << name << "\": ";
             // TODO: use writeString (?)
         }
 
         template<typename StrCharT>
         void fieldName(const std::basic_string<StrCharT>& name)
         {
-            m_sink << '"' << name << "\": ";
+            (*m_sink) << '"' << name << "\": ";
             // TODO: use writeString (?)
         }
 
         void separator()
         {
-            m_sink << ", ";
+            (*m_sink) << ", ";
         }
 
         void objectEnd()
         {
-            m_sink << '}';
+            (*m_sink) << '}';
         }
 
         void arrayBegin()
         {
-            m_sink << '[';
+            (*m_sink) << '[';
         }
 
         void arrayEnd()
         {
-            m_sink << ']';
+            (*m_sink) << ']';
         }
 
         friend void serialize(this_type& stream, std::nullptr_t)
         {
-            stream.m_sink << "null";
+            (*stream.m_sink) << "null";
         }
 
         friend void serialize(this_type& stream, bool value)
         {
-            stream.m_sink << (value ? "true" : "false");
+            (*stream.m_sink) << (value ? "true" : "false");
         }
 
         template<typename T>
         friend typename std::enable_if<std::is_arithmetic<T>::value>::type serialize(this_type& stream, T& value)
         {
-            stream.m_sink << value;
+            (*stream.m_sink) << value;
         }
 
         template<typename SrcCharT>
         friend void serialize(this_type& stream, const std::basic_string<SrcCharT>& value)
         {
-            details::writeString(value, [&stream](char c){ stream.m_sink.put(c); });
+            details::writeString(value, [&stream](char c){ stream.m_sink->put(c); });
         }
 
-        void operator=(const Stream&) = delete;
-
     private:
-        Sink& m_sink;
+        Sink* m_sink;
     };
 
     template<class X, typename Pointer>
