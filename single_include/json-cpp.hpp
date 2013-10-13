@@ -3,8 +3,8 @@
 //
 // JSON for C++
 // https://github.com/ascheglov/json-cpp
-// Version 0.1 alpha, rev. 80d64c35bb9ec660c0e79912ef41943f374f2671
-// Generated 2013-09-25 18:51:43.704096 UTC
+// Version 0.1 alpha, rev. 5f30c35dd68abbcf2a6d9f95ddfb47331b3db607
+// Generated 2013-10-13 17:09:59.316406 UTC
 //
 // Belongs to the public domain
 
@@ -847,72 +847,70 @@ namespace jsoncpp
     public:
         using this_type = Generator<details::Traits2<CharT, Sink>>;
 
-        explicit Stream(Sink& sink) : m_sink(sink) {}
+        explicit Stream(Sink& sink) : m_sink(&sink) {}
 
         void objectBegin()
         {
-            m_sink << "{";
+            (*m_sink) << "{";
         }
 
         void fieldName(const char* name)
         {
-            m_sink << '"' << name << "\": ";
+            (*m_sink) << '"' << name << "\": ";
             // TODO: use writeString (?)
         }
 
         template<typename StrCharT>
         void fieldName(const std::basic_string<StrCharT>& name)
         {
-            m_sink << '"' << name << "\": ";
+            (*m_sink) << '"' << name << "\": ";
             // TODO: use writeString (?)
         }
 
         void separator()
         {
-            m_sink << ", ";
+            (*m_sink) << ", ";
         }
 
         void objectEnd()
         {
-            m_sink << '}';
+            (*m_sink) << '}';
         }
 
         void arrayBegin()
         {
-            m_sink << '[';
+            (*m_sink) << '[';
         }
 
         void arrayEnd()
         {
-            m_sink << ']';
+            (*m_sink) << ']';
         }
 
         friend void serialize(this_type& stream, std::nullptr_t)
         {
-            stream.m_sink << "null";
+            (*stream.m_sink) << "null";
         }
 
         friend void serialize(this_type& stream, bool value)
         {
-            stream.m_sink << (value ? "true" : "false");
+            (*stream.m_sink) << (value ? "true" : "false");
         }
 
         template<typename T>
         friend typename std::enable_if<std::is_arithmetic<T>::value>::type serialize(this_type& stream, T& value)
         {
-            stream.m_sink << value;
+            (*stream.m_sink) << value;
         }
 
         template<typename SrcCharT>
         friend void serialize(this_type& stream, const std::basic_string<SrcCharT>& value)
         {
-            details::writeString(value, [&stream](char c){ stream.m_sink.put(c); });
+            details::writeString(value, [&stream](char c){ stream.m_sink->put(c); });
         }
 
-        void operator=(const Stream&) = delete;
-
     private:
-        Sink& m_sink;
+        Sink* m_sink;
     };
 
     template<class X, typename Pointer>
