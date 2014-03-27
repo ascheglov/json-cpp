@@ -3,8 +3,8 @@
 //
 // JSON for C++
 // https://github.com/ascheglov/json-cpp
-// Version 0.1 alpha, rev. 5f30c35dd68abbcf2a6d9f95ddfb47331b3db607
-// Generated 2013-10-13 17:09:59.316406 UTC
+// Version 0.1 alpha, rev. 170121e2dc099895064305e38bfb25d90a807ce3
+// Generated 2014-03-27 17:16:47.104492 UTC
 //
 // Belongs to the public domain
 
@@ -359,37 +359,37 @@ namespace jsoncpp { namespace details
         else if (c < 0x800)
         {
             add(0xC0 | c >> 6);
-            add(0x80 | c & 0x3f);
+            add(0x80 | (c & 0x3f));
         }
         else if (c < 0x10000)
         {
             add(0xE0 | c >> 12);
-            add(0x80 | (c >> 6) & 0x3f);
-            add(0x80 | c & 0x3f);
+            add(0x80 | ((c >> 6) & 0x3f));
+            add(0x80 | (c & 0x3f));
         }
         else if (c < 0x200000)
         {
             add(0xF0 | c >> 18);
-            add(0x80 | (c >> 12) & 0x3f);
-            add(0x80 | (c >> 6) & 0x3f);
-            add(0x80 | c & 0x3f);
+            add(0x80 | ((c >> 12) & 0x3f));
+            add(0x80 | ((c >> 6) & 0x3f));
+            add(0x80 | (c & 0x3f));
         }
         else if (c < 0x4000000)
         {
             add(0xF8 | c >> 24);
-            add(0x80 | (c >> 18) & 0x3f);
-            add(0x80 | (c >> 12) & 0x3f);
-            add(0x80 | (c >> 6) & 0x3f);
-            add(0x80 | c & 0x3f);
+            add(0x80 | ((c >> 18) & 0x3f));
+            add(0x80 | ((c >> 12) & 0x3f));
+            add(0x80 | ((c >> 6) & 0x3f));
+            add(0x80 | (c & 0x3f));
         }
         else
         {
             add(0xFC | c >> 30);
-            add(0x80 | (c >> 24) & 0x3f);
-            add(0x80 | (c >> 18) & 0x3f);
-            add(0x80 | (c >> 12) & 0x3f);
-            add(0x80 | (c >> 6) & 0x3f);
-            add(0x80 | c & 0x3f);
+            add(0x80 | ((c >> 24) & 0x3f));
+            add(0x80 | ((c >> 18) & 0x3f));
+            add(0x80 | ((c >> 12) & 0x3f));
+            add(0x80 | ((c >> 6) & 0x3f));
+            add(0x80 | (c & 0x3f));
         }
     }
 
@@ -521,6 +521,7 @@ namespace jsoncpp { namespace details
         }
     }
 }}
+
 // json-cpp/details/string_parser.hpp end
 //----------------------------------------------------------------------
 
