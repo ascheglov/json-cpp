@@ -1,5 +1,6 @@
 add_executable(tests
   catch_wrap.hpp
+  abstract_class_example.cpp
   examples.cpp
   generator_tests.cpp
   parser_tests.cpp
