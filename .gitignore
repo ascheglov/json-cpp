@@ -1,8 +1,1 @@
-Debug-*
-Release-*
-*.opensdf
-*.sdf
-*.user
-*.suo
-*.o
-*.exe
+out/

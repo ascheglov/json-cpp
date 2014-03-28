@@ -9,7 +9,7 @@
 #endif
 
 #define CATCH_CONFIG_CPP11_NULLPTR
-#include <catch.hpp>
+#include "catch/catch.hpp"
 
 #if defined _MSC_VER
 #pragma warning(pop)
