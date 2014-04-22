@@ -248,7 +248,7 @@ namespace jsoncpp
     }
 
     template<typename T, typename CharT>
-    inline void parse(T& object, std::basic_string<CharT>& str)
+    inline void parse(T& object, const std::basic_string<CharT>& str)
     {
         parse<CharT>(object, std::begin(str), std::end(str));
     }
